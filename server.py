@@ -45,9 +45,9 @@ class DDosServer:
                 client_socket.close()
                 return
 
-            # if ip not in self.challenge_ips:
-            #     self.send_challenge(client_socket, ip)
-            #     return
+            if ip not in self.challenge_ips:
+                self.send_challenge(client_socket, ip)
+                return
 
             data = client_socket.recv(1024).decode()
             if data:
@@ -58,18 +58,18 @@ class DDosServer:
         finally:
             client_socket.close()
 
-    # def send_challenge(self, client_socket, ip):
-    #     challenge = random.randint(1000, 9999)
-    #     client_socket.send(f"Solve this challenge: {challenge} + 1 = ?".encode())
-    #     response = client_socket.recv(1024).decode()
+    def send_challenge(self, client_socket, ip):
+        challenge = random.randint(1000, 9999)
+        client_socket.send(f"Solve this challenge: {challenge} + 1 = ?".encode())
+        response = client_socket.recv(1024).decode()
 
-    #     if response.strip() == str(challenge + 1):
-    #         with self.lock:
-    #             self.challenge_ips.add(ip)
-    #         client_socket.send(b"Challenge passed. Welcome!")
-    #     else:
-    #         client_socket.send(b"Challenge failed. Connection closed.")
-    #     client_socket.close()
+        if response.strip() == str(challenge + 1):
+            with self.lock:
+                self.challenge_ips.add(ip)
+            client_socket.send(b"Challenge passed. Welcome!")
+        else:
+            client_socket.send(b"Challenge failed. Connection closed.")
+        client_socket.close()
 
     def log_requests(self):
         while True:
